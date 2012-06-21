@@ -58,11 +58,16 @@ dilate::usage=
    in xrange x yrange such that B, reflected and translated
    by the coordinates, intersects with A.
    
-   dilate[A,B,on,startx,endx,starty,endy] returns 
-   dilate[A,B,on,{startx...endx},{starty...endy}]"
-dilate[A_,B_,on_,startx_,endx_,starty_,endy_]:=
+   dilate[A,B,startx,endx,starty,endy] returns 
+   dilate[A,B,{startx...endx},{starty...endy}]"
+dilate[A_,B_]:=
+  With[{height = Length[A]},
+        With[{halfHeight = height/2,
+              halfWidth = If[height > 0, Length[A[[1]]]/2,0]},
+              dilate[A,B,-halfWidth,halfWidth,-halfHeight,halfHeight]]]
+dilate[A_,B_,startx_,endx_,starty_,endy_]:=
   dilate[A,B,on,Range[startx,endx],Range[starty,endy]];
-dilate[A_,B_,on_,xrange_,yrange_]:=
+dilate[A_,B_,xrange_,yrange_]:=
   Select[cartesianProduct[xrange,yrange],
          Intersection[translate[reflect[B],#[[1]],#[[2]]],A] != {}]
 
@@ -72,10 +77,10 @@ imageDataCoords::usage=
   "imageDataCoords[xs,on] returns the coordinates of 'on' pixels in
    xs, translated such that the center of the image is at 0,0."
 imageDataCoords[xs_,on_]:=
-  With[{height = Length[xs]},
-        translate[reflectY[swapXY[arrayCoords[xs,on]]],
-                  -Ceiling[height/2],
-                  -Ceiling[If[height > 0,Length[xs[[1]]],0]/2]]]        
+  With[{rows = Length[xs]},
+        reflectY[translate[swapXY[arrayCoords[xs,on]],
+                          -Ceiling[rows/2],
+                          -Ceiling[If[rows > 0,Length[xs[[1]]],0]/2]]]]        
 
 coordsToImageData::usage=
   "coordsToImageData[xs,on,off,width,height]
@@ -84,9 +89,9 @@ coordsToImageData::usage=
    setting it to 'on', translated such that 0,0 corresponds to 
    arr[[width/2]][[height/2]]."
 coordsToImageData[xs_,on_,off_,width_,height_]:=
-  coordsToArray[swapXY[reflectY[translate[xs,
-                                          Ceiling[height/2],
-                                          Ceiling[width/2]]]],
+  coordsToArray[swapXY[translate[reflectY[xs],
+                                 Ceiling[height/2],
+                                 Ceiling[width/2]]],
                 on,off,height,width]
 
 imageCoords::usage=
