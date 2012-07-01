@@ -4,7 +4,7 @@ BeginPackage["Morphology`"]
 
 cartesianProduct::usage=
   "cartesianProduct[xs,ys] returns the list
-  {{x,y} | for all x in xs, for all y in}"
+  {{x,y} | for all x in xs, for all y in ys}"
 cartesianProduct[xs_,ys_]:=Flatten[Outer[List,xs,ys],1]
 
 some::usage=
@@ -59,10 +59,7 @@ translate[xs_,zx_,zy_] := {#[[1]]+zx,#[[2]]+zy} & /@ xs
 
 dilate::usage=
   "dilate[A,B] returns the dilation of A by B."
-dilate[A_,B_]:=Flatten[Outer[#1 + #2 &,A,B,1],1]
-
-                                        
-
+dilate[A_,B_]:=Flatten[Outer[Plus,A,B,1],1]
 
 imageDataCoords::usage=
   "imageDataCoords[xs,on] returns the coordinates of 'on' pixels in
@@ -96,12 +93,3 @@ coordsToImage[xs_,on_,off_,width_,height_]:=
   Image[coordsToImageData[xs,on,off,width,height]]
 
 EndPackage[]
-
-
-
-
-
-
-
-
-
