@@ -39,7 +39,7 @@ arrayCoords[xs_,on_]:=
 
 reflect::usage=
   "reflect[xs] returns the set of coordinates xs reflected
-   over the y axis at the origin."
+   at the origin."
 reflect[xs_]:= -# & /@ xs
 
 reflectY::usage=
@@ -54,7 +54,9 @@ swapXY[xs_]:= {#[[2]],#[[1]]} & /@ xs
 
 translate::usage=
   "translate[xs,zx,zy] returns the set of coordinates xs translated
-   such that the origin is at zx,zy."
+   such that the origin is at zx,zy.
+   translate[xs,z] returns translate[xs,{z[1],z[2]}]."
+translate[xs_,z_] := translate[xs,z[[1]],z[[2]]]
 translate[xs_,zx_,zy_] := {#[[1]]+zx,#[[2]]+zy} & /@ xs
 
 dilate::usage=
@@ -91,5 +93,15 @@ coordsToImage::usage=
    Image[coordsToImageData[xs,on,off,width,height]]"
 coordsToImage[xs_,on_,off_,width_,height_]:=
   Image[coordsToImageData[xs,on,off,width,height]]
+
+onImage::usage=
+  "onImage[f,a,b,on,off] applies f to image a, passing it
+   through imageCoords using 'on', and set of coordinates b,
+   and returns the resulting set as an image, with coordinates
+   represented by 'on', and all other pixels represented by 'off.'
+onImage[f_,a_,b_,on_,off_] :=
+  With[{dimension = ImageDimensions[a]},
+    coordsToImage[f[imageCoords[a,on],b],on,off,dimension[[1]],
+                                                dimension[[2]]]]
 
 EndPackage[]
