@@ -95,10 +95,19 @@ coordsToImage[xs_,on_,off_,width_,height_]:=
   Image[coordsToImageData[xs,on,off,width,height]]
 
 onImage::usage=
-  "onImage[f,a,b,on,off] applies f to image a, passing it
+  "onImage[f,a,on,off] applies f to image a, passing it
+   through imageCoords using 'on,' and returns the resulting
+   set as an image, with coordinates represented by 'on' and all
+   other pixels represented by 'off.'
+
+   onImage[f,a,b,on,off] applies f to image a, passing it
    through imageCoords using 'on', and set of coordinates b,
    and returns the resulting set as an image, with coordinates
-   represented by 'on', and all other pixels represented by 'off.'
+   represented by 'on', and all other pixels represented by 'off.'"
+onImage[f_,a_,on_,off_] :=
+  With[{dimension = ImageDimensions[a]},
+    coordsToImage[f[imageCoords[a,on]],on,off,dimension[[1]],
+                                              dimension[[2]]]]
 onImage[f_,a_,b_,on_,off_] :=
   With[{dimension = ImageDimensions[a]},
     coordsToImage[f[imageCoords[a,on],b],on,off,dimension[[1]],
