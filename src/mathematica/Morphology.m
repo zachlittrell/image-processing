@@ -2,15 +2,7 @@
 
 BeginPackage["Morphology`"]
 
-cartesianProduct::usage=
-  "cartesianProduct[xs,ys] returns the list
-  {{x,y} | for all x in xs, for all y in ys}"
-cartesianProduct[xs_,ys_]:=Flatten[Outer[List,xs,ys],1]
-
-some::usage=
-  "some[f,xs] returns True iff f returns true for at least one element in xs."
-some[f_,xs_] := Select[xs,f,1] != {}
-
+(* Functions for converting between Images and arrays of coordinates*)
 coordsToArray::usage =
   "coordsToArray[xs,on,off,rows,columns] takes an array of
    pairs of indices, and returns a rows x columns array, arr,
@@ -35,37 +27,6 @@ arrayCoords[xs_,on_]:=
                  cartesianProduct[Range[height],Range[Length[xs[[1]]]]],
                 {}]],
          xs[[#[[1]]]][[Last[#]]]==on &]
-
-
-reflect::usage=
-  "reflect[xs] returns the set of coordinates xs reflected
-   at the origin."
-reflect[xs_]:= -# & /@ xs
-
-reflectY::usage=
-  "reflectY[xs] returns the set of coordinates xs reflected
-   over the x axis"
-reflectY[xs_]:={#[[1]],-#[[2]]} & /@ xs
-
-swapXY::usage=
-  "swapXY[xs] returns the set of coordinates xs with each pair,
-   x and y, swapped"
-swapXY[xs_]:= {#[[2]],#[[1]]} & /@ xs
-
-translate::usage=
-  "translate[xs,zx,zy] returns the set of coordinates xs translated
-   such that the origin is at zx,zy.
-   translate[xs,z] returns translate[xs,{z[1],z[2]}]."
-translate[xs_,z_] := translate[xs,z[[1]],z[[2]]]
-translate[xs_,zx_,zy_] := {#[[1]]+zx,#[[2]]+zy} & /@ xs
-
-dilate::usage=
-  "dilate[A,B] returns the dilation of A by B."
-dilate[A_,B_]:= Union @@ (translate[A, #] &) /@ B
-
-erode::usage=
-  "erode[A,B] returns the erosion of A by B."
-erode[A_,B_] := Intersection @@ (translate[A,-#] &) /@ B
 
 imageDataCoords::usage=
   "imageDataCoords[xs,on] returns the coordinates of 'on' pixels in
@@ -116,5 +77,48 @@ onImage[f_,a_,b_,on_,off_] :=
   With[{dimension = ImageDimensions[a]},
     coordsToImage[f[imageCoords[a,on],b],on,off,dimension[[1]],
                                                 dimension[[2]]]]
+
+(* Coordinate Set Functions   *)
+
+reflect::usage=
+  "reflect[xs] returns the set of coordinates xs reflected
+   at the origin."
+reflect[xs_]:= -# & /@ xs
+
+reflectY::usage=
+  "reflectY[xs] returns the set of coordinates xs reflected
+   over the x axis"
+reflectY[xs_]:={#[[1]],-#[[2]]} & /@ xs
+
+swapXY::usage=
+  "swapXY[xs] returns the set of coordinates xs with each pair,
+   x and y, swapped"
+swapXY[xs_]:= {#[[2]],#[[1]]} & /@ xs
+
+translate::usage=
+  "translate[xs,zx,zy] returns the set of coordinates xs translated
+   such that the origin is at zx,zy.
+   translate[xs,z] returns translate[xs,{z[1],z[2]}]."
+translate[xs_,z_] := translate[xs,z[[1]],z[[2]]]
+translate[xs_,zx_,zy_] := {#[[1]]+zx,#[[2]]+zy} & /@ xs
+
+dilate::usage=
+  "dilate[A,B] returns the dilation of A by B."
+dilate[A_,B_]:= Union @@ (translate[A, #] &) /@ B
+
+erode::usage=
+  "erode[A,B] returns the erosion of A by B."
+erode[A_,B_] := Intersection @@ (translate[A,-#] &) /@ B
+
+(* Set Operations *)
+
+cartesianProduct::usage=
+  "cartesianProduct[xs,ys] returns the list
+  {{x,y} | for all x in xs, for all y in ys}"
+cartesianProduct[xs_,ys_]:=Flatten[Outer[List,xs,ys],1]
+
+some::usage=
+  "some[f,xs] returns True iff f returns true for at least one element in xs."
+some[f_,xs_] := Select[xs,f,1] != {}
 
 EndPackage[]
