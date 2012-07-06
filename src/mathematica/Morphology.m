@@ -61,7 +61,11 @@ translate[xs_,zx_,zy_] := {#[[1]]+zx,#[[2]]+zy} & /@ xs
 
 dilate::usage=
   "dilate[A,B] returns the dilation of A by B."
-dilate[A_,B_]:=Flatten[Outer[Plus,A,B,1],1]
+dilate[A_,B_]:= Union @@ (translate[A, #] &) /@ B
+
+erode::usage=
+  "erode[A,B] returns the erosion of A by B."
+erode[A_,B_] := Intersection @@ (translate[A,-#] &) /@ B
 
 imageDataCoords::usage=
   "imageDataCoords[xs,on] returns the coordinates of 'on' pixels in
