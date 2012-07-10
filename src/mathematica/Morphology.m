@@ -24,9 +24,9 @@ arrayCoords::usage=
 arrayCoords[xs_,on_]:=
   Select[With[{height = Length[xs]},
               If[height > 0,
-                 cartesianProduct[Range[height],Range[Length[xs[[1]]]]],
+                 Tuples[{Range[height],Range[Length[xs[[1]]]]}],
                 {}]],
-         xs[[#[[1]]]][[Last[#]]]==on &]
+         xs[[First[#]]][[Last[#]]]==on &]
 
 imageDataCoords::usage=
   "imageDataCoords[xs,on] returns the coordinates of 'on' pixels in
@@ -35,7 +35,7 @@ imageDataCoords[xs_,on_]:=
   With[{rows = Length[xs]},
         reflectY[translate[swapXY[arrayCoords[xs,on]],
                           -Ceiling[rows/2],
-                          -Ceiling[If[rows > 0,Length[xs[[1]]],0]/2]]]]        
+                          -Ceiling[If[rows > 0,Length[First[xs]],0]/2]]]]        
 
 coordsToImageData::usage=
   "coordsToImageData[xs,on,off,width,height]
@@ -71,54 +71,46 @@ onImage::usage=
    represented by 'on', and all other pixels represented by 'off.'"
 onImage[f_,a_,on_,off_] :=
   With[{dimension = ImageDimensions[a]},
-    coordsToImage[f[imageCoords[a,on]],on,off,dimension[[1]],
-                                              dimension[[2]]]]
+    coordsToImage[f[imageCoords[a,on]],on,off,First[dimension],
+                                              Last[dimension]]]
 onImage[f_,a_,b_,on_,off_] :=
   With[{dimension = ImageDimensions[a]},
-    coordsToImage[f[imageCoords[a,on],b],on,off,dimension[[1]],
-                                                dimension[[2]]]]
+    coordsToImage[f[imageCoords[a,on],b],on,off,First[dimension],
+                                                Last[dimension]]]
 
 (* Coordinate Set Functions   *)
 
 reflect::usage=
   "reflect[xs] returns the set of coordinates xs reflected
    at the origin."
-reflect[xs_]:= -# & /@ xs
+reflect[xs_]:= Minus /@ xs
 
 reflectY::usage=
   "reflectY[xs] returns the set of coordinates xs reflected
    over the x axis"
-reflectY[xs_]:={#[[1]],-#[[2]]} & /@ xs
+reflectY[xs_]:={First[#],-Last[#]} & /@ xs
 
 swapXY::usage=
   "swapXY[xs] returns the set of coordinates xs with each pair,
    x and y, swapped"
-swapXY[xs_]:= {#[[2]],#[[1]]} & /@ xs
+swapXY[xs_]:= Reverse /@ xs
 
 translate::usage=
   "translate[xs,zx,zy] returns the set of coordinates xs translated
    such that the origin is at zx,zy.
    translate[xs,z] returns translate[xs,{z[1],z[2]}]."
 translate[xs_,z_] := translate[xs,z[[1]],z[[2]]]
-translate[xs_,zx_,zy_] := {#[[1]]+zx,#[[2]]+zy} & /@ xs
+translate[xs_,zx_,zy_] := {First[#]+zx,Last[#]+zy} & /@ xs
 
 dilate::usage=
   "dilate[A,B] returns the dilation of A by B."
-dilate[A_,B_]:= Union @@ (translate[A, #] &) /@ B
+dilate[A_,B_]:= Fold[Union[#1,translate[A,#2]]&,{},B]
 
 erode::usage=
   "erode[A,B] returns the erosion of A by B."
-erode[A_,B_] := Intersection @@ (translate[A,-#] &) /@ B
-
-(* Set Operations *)
-
-cartesianProduct::usage=
-  "cartesianProduct[xs,ys] returns the list
-  {{x,y} | for all x in xs, for all y in ys}"
-cartesianProduct[xs_,ys_]:=Flatten[Outer[List,xs,ys],1]
-
-some::usage=
-  "some[f,xs] returns True iff f returns true for at least one element in xs."
-some[f_,xs_] := Select[xs,f,1] != {}
+erode[A_,B_] := If[Length[B] == 0,
+                    {},
+                    Fold[Intersection[#1,translate[A,-#2]]&,
+                         translate[A,First[B]],Rest[B]]]
 
 EndPackage[]
