@@ -113,4 +113,9 @@ erode[A_,B_] := If[Length[B] == 0,
                     Fold[Intersection[#1,translate[A,-#2]]&,
                          translate[A,First[B]],Rest[B]]]
 
+extractBoundary::usage=
+  "extractBoundary[A,B] returns the boundary of A, using
+   B as the structuring element to create the boundary."
+extractBoundary[A_,B_]:=Complement[A,erode[A,B]]
+
 EndPackage[]
