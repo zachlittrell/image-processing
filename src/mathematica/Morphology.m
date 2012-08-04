@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 BeginPackage["Morphology`"]
-
+Needs["Sets`","~/image-processing/src/mathematica/Sets.m"]
 (* Functions for converting between Images and arrays of coordinates*)
 coordsToArray::usage =
   "coordsToArray[xs,on,off,rows,columns] takes an array of
@@ -11,7 +11,7 @@ coordsToArray::usage =
 coordsToArray[xs_, on_, off_, rows_, columns_] := 
  Module[{arr = ConstantArray[off, {rows, columns}]},
          Do[With[{x = First[xy],
-                  y = Last[xy]},
+                  y = Last[xy]},Grap
                  If[x > 0 && x <= rows && y > 0 && y <= columns,
                    arr[[x]][[y]] = on]], 
             {xy, xs}];
@@ -52,6 +52,11 @@ coordsToImageData[xs_,on_,off_,width_,height_]:=
 imageCoords::usage=
   "imageCoords[i,on] returns imageDataCoords[ImageData[i],on]"
 imageCoords[i_,on_]:= imageDataCoords[ImageData[i],on]
+
+imageCoord::usage=
+  "imageCoord[x,y,width,height] returns the pair of indices as a coordinate
+   on the image, as per imageDataCoords."
+imageCoord[x_,y_,width_,height_] := {y-Ceiling[height/2],-x+Ceiling[width/2]}
 
 coordsToImage::usage=
   "coordsToImage[xs,on,off,width,height] returns 
@@ -118,4 +123,16 @@ extractBoundary::usage=
    B as the structuring element to create the boundary."
 extractBoundary[A_,B_]:=Complement[A,erode[A,B]]
 
+fillRegion::usage=
+  "fillRegion[A,B,p] returns A with the region that contains p
+   filled in, using B to progressively fill the region in."
+fillRegion[A_,B_,p_] := Last[NestWhile[With[{last=Last[#]},
+                                              {last,
+                                               Complement[dilate[last,B],A]}]&,
+                                         {{},{p}},
+                                         !equalSetsQ[First[#],Last[#]]&]]
+
 EndPackage[]
+
+
+
