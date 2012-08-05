@@ -118,6 +118,14 @@ erode[A_,B_] := If[Length[B] == 0,
                     Fold[Intersection[#1,translate[A,-#2]]&,
                          translate[A,First[B]],Rest[B]]]
 
+open::usage=
+  "open[A,B] returns the opening of A by B"
+open[A_,B_]:=dilate[erode[A,B],B]
+
+close::usage=
+  "close[A,B] returns the closing of A by B"
+close[A_,B_]:=erode[dilate[A,B],B]
+
 extractBoundary::usage=
   "extractBoundary[A,B] returns the boundary of A, using
    B as the structuring element to create the boundary."
@@ -146,6 +154,3 @@ extractConnectedComponent[A_,B_,p_]:= Last[NestWhile[With[{last=Last[#]},
                                                        !equalSetsQ[First[#],Last[#]]&]]
 
 EndPackage[]
-
-
-
