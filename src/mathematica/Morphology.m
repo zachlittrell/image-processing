@@ -124,13 +124,26 @@ extractBoundary::usage=
 extractBoundary[A_,B_]:=Complement[A,erode[A,B]]
 
 fillRegion::usage=
-  "fillRegion[A,B,p] returns A with the region that contains p
+  "fillRegion[A,B,p] returns the region in A that contains p
    filled in, using B to progressively fill the region in."
 fillRegion[A_,B_,p_] := Last[NestWhile[With[{last=Last[#]},
                                               {last,
                                                Complement[dilate[last,B],A]}]&,
-                                         {{},{p}},
-                                         !equalSetsQ[First[#],Last[#]]&]]
+                                       {{},{p}},
+                                       !equalSetsQ[First[#],Last[#]]&]]
+addFilledRegion::usage=
+  "addFilledRegion[A,B,p] returns A with the region in A that contains
+   p filled in, using B to progressively fill the region in."
+addFilledRegion[A_,B_,p_] := Union[A,fillRegion[A,B,p]]
+
+extractConnectedComponent::usage=
+  "extractConnectedComponent[A,B,p] returns all the points conntected to p
+   in A, using B to progressively find the connected component."
+extractConnectedComponent[A_,B_,p_]:= Last[NestWhile[With[{last=Last[#]},
+                                                           {last,
+                                                           dilate[last,B]\[Intersection]A}]&,
+                                                      {{},{p}},
+                                                       !equalSetsQ[First[#],Last[#]]&]]
 
 EndPackage[]
 
