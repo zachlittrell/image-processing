@@ -34,8 +34,8 @@ imageDataCoords::usage=
 imageDataCoords[xs_,on_]:=
   With[{rows = Length[xs]},
         reflectY[translate[swapXY[arrayCoords[xs,on]],
-                          -Ceiling[rows/2],
-                          -Ceiling[If[rows > 0,Length[First[xs]],0]/2]]]]        
+                          -Ceiling[If[rows > 0,Length[First[xs]],0]/2],
+                          -Ceiling[rows/2]]]]        
 
 coordsToImageData::usage=
   "coordsToImageData[xs,on,off,width,height]
@@ -45,8 +45,8 @@ coordsToImageData::usage=
    arr[[width/2]][[height/2]]."
 coordsToImageData[xs_,on_,off_,width_,height_]:=
   coordsToArray[swapXY[translate[reflectY[xs],
-                                 Ceiling[height/2],
-                                 Ceiling[width/2]]],
+                                 Ceiling[width/2],
+                                 Ceiling[height/2]]],
                 on,off,height,width]
 
 imageCoords::usage=
@@ -56,7 +56,7 @@ imageCoords[i_,on_]:= imageDataCoords[ImageData[i],on]
 imageCoord::usage=
   "imageCoord[x,y,width,height] returns the pair of indices as a coordinate
    on the image, as per imageDataCoords."
-imageCoord[x_,y_,width_,height_] := {y-Ceiling[height/2],-x+Ceiling[width/2]}
+imageCoord[x_,y_,width_,height_] := {y-Ceiling[width/2],-x+Ceiling[height/2]}
 
 coordsToImage::usage=
   "coordsToImage[xs,on,off,width,height] returns 
@@ -125,6 +125,11 @@ open[A_,B_]:=dilate[erode[A,B],B]
 close::usage=
   "close[A,B] returns the closing of A by B"
 close[A_,B_]:=erode[dilate[A,B],B]
+
+hitOrMissTransform::usage=
+  "hitOrMissTransform[A,B1,B2] returns the Hit-or-Miss Transformation
+   of A by B1 and B2."
+hitOrMissTransform[A_,B1_,B2_]:=Complement[erode[A,B1],dilate[A,reflect[B2]]]
 
 extractBoundary::usage=
   "extractBoundary[A,B] returns the boundary of A, using

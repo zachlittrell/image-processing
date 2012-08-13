@@ -2,6 +2,9 @@
 
 BeginPackage["Sets`"]
 
+equalSetsQ::usage=
+  "equalSetsQ[xs,ys] returns true if xs is a subset of ys
+   and ys is a subset of xs."
 equalSetsQ[xs_,ys_]:=Length[xs]==Length[ys]&&Complement[xs,ys]=={}
 
 some::usage=
