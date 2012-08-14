@@ -116,7 +116,7 @@ erode::usage=
 erode[A_,B_] := If[Length[B] == 0,
                     {},
                     Fold[Intersection[#1,translate[A,-#2]]&,
-                         translate[A,First[B]],Rest[B]]]
+                         translate[A,-First[B]],Rest[B]]]
 
 open::usage=
   "open[A,B] returns the opening of A by B"
@@ -128,13 +128,24 @@ close[A_,B_]:=erode[dilate[A,B],B]
 
 hitOrMissTransform::usage=
   "hitOrMissTransform[A,B1,B2] returns the Hit-or-Miss Transformation
-   of A by B1 and B2."
+   of A by B1 and B2.
+
+   hitOrMissTransform[A,Bs] returns the Hit-or-Miss Transformation
+   of A by Bs[1] and Bs[2]."
 hitOrMissTransform[A_,B1_,B2_]:=Complement[erode[A,B1],dilate[A,reflect[B2]]]
+hitOrMissTransform[A_,Bs_]:=hitOrMissTransform[A,First[Bs],Last[Bs]]
 
 extractBoundary::usage=
   "extractBoundary[A,B] returns the boundary of A, using
    B as the structuring element to create the boundary."
 extractBoundary[A_,B_]:=Complement[A,erode[A,B]]
+
+extractDilatedBoundary::usage=
+  "extractDilatedBoundary[A,B] returns the boundary of A, using
+   B as the structuring element to create the boudnary.
+   extractDilatedBoundary differs from extractBoundary in that
+   it uses dilation instead of erosion to find the boundary."
+extractDilatedBoundary[A_,B_]:=Complement[dilate[A,B],A]
 
 fillRegion::usage=
   "fillRegion[A,B,p] returns the region in A that contains p
@@ -158,4 +169,16 @@ extractConnectedComponent[A_,B_,p_]:= Last[NestWhile[With[{last=Last[#]},
                                                       {{},{p}},
                                                        !equalSetsQ[First[#],Last[#]]&]]
 
+convexHullStep[A_,bs_] := Last[NestWhile[With[{last = Last[#]},
+                                              {last,
+                                               Union[hitOrMissTransform[last,bs],
+                                                     A]}]&,
+                                         {{},{A}},
+                                         !equalSetsQ[First[#],Last[#]]&]]
+                                          
+
+convexHull::usage=
+  "convexHull[A,Bs] returns the Convex Hull of A using the pairs of sets in B as the structuring
+   elements."
+convexHull[A_,Bs_]:= Union @@ (convexHullStep[A,#] & /@ Bs)
 EndPackage[]
