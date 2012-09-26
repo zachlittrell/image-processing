@@ -11,7 +11,7 @@ coordsToArray::usage =
 coordsToArray[xs_, on_, off_, rows_, columns_] := 
  Module[{arr = ConstantArray[off, {rows, columns}]},
          Do[With[{x = First[xy],
-                  y = Last[xy]},Grap
+                  y = Last[xy]},
                  If[x > 0 && x <= rows && y > 0 && y <= columns,
                    arr[[x]][[y]] = on]], 
             {xy, xs}];
@@ -150,11 +150,8 @@ extractDilatedBoundary[A_,B_]:=Complement[dilate[A,B],A]
 fillRegion::usage=
   "fillRegion[A,B,p] returns the region in A that contains p
    filled in, using B to progressively fill the region in."
-fillRegion[A_,B_,p_] := Last[NestWhile[With[{last=Last[#]},
-                                              {last,
-                                               Complement[dilate[last,B],A]}]&,
-                                       {{},{p}},
-                                       !equalSetsQ[First[#],Last[#]]&]]
+fillRegion[A_,B_,p_] := convergeSet[Complement[dilate[#,B],A]&,{p}]
+
 addFilledRegion::usage=
   "addFilledRegion[A,B,p] returns A with the region in A that contains
    p filled in, using B to progressively fill the region in."
@@ -163,22 +160,22 @@ addFilledRegion[A_,B_,p_] := Union[A,fillRegion[A,B,p]]
 extractConnectedComponent::usage=
   "extractConnectedComponent[A,B,p] returns all the points conntected to p
    in A, using B to progressively find the connected component."
-extractConnectedComponent[A_,B_,p_]:= Last[NestWhile[With[{last=Last[#]},
-                                                           {last,
-                                                           dilate[last,B]\[Intersection]A}]&,
-                                                      {{},{p}},
-                                                       !equalSetsQ[First[#],Last[#]]&]]
+extractConnectedComponent[A_,B_,p_]:= convergeSet[dilate[#,B]\[Intersection]A&,{p}]
 
-convexHullStep[A_,bs_] := Last[NestWhile[With[{last = Last[#]},
-                                              {last,
-                                               Union[hitOrMissTransform[last,bs],
-                                                     A]}]&,
-                                         {{},{A}},
-                                         !equalSetsQ[First[#],Last[#]]&]]
+convexHullStep[A_,bs_] := Union[Last[NestWhile[With[{last = Last[#]},
+                                                {last,
+                                                 hitOrMissTransform[last,bs]}]&,
+                                                {{},A},
+                                                !equalSetsQ[First[#],Last[#]]&]],
+                                 A]
+                                 
                                           
 
 convexHull::usage=
   "convexHull[A,Bs] returns the Convex Hull of A using the pairs of sets in B as the structuring
    elements."
-convexHull[A_,Bs_]:= Union @@ (convexHullStep[A,#] & /@ Bs)
+convexHull[A_,Bs_]:= Union @@ ((convexHullStep[A,#] &) /@ Bs)
 EndPackage[]
+
+
+
