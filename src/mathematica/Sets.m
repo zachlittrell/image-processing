@@ -1,5 +1,3 @@
-(* ::Package:: *)
-
 BeginPackage["Sets`"]
 
 equalSetsQ::usage=

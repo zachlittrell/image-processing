@@ -1,5 +1,3 @@
-(* ::Package:: *)
-
 BeginPackage["Morphology`"]
 Needs["Sets`","~/image-processing/src/mathematica/Sets.m"]
 (* Functions for converting between Images and arrays of coordinates*)
@@ -162,20 +160,20 @@ extractConnectedComponent::usage=
    in A, using B to progressively find the connected component."
 extractConnectedComponent[A_,B_,p_]:= convergeSet[dilate[#,B]\[Intersection]A&,{p}]
 
-convexHullStep[A_,bs_] := Union[Last[NestWhile[With[{last = Last[#]},
-                                                {last,
-                                                 hitOrMissTransform[last,bs]}]&,
-                                                {{},A},
-                                                !equalSetsQ[First[#],Last[#]]&]],
-                                 A]
-                                 
+convexSetStep::usage=
+  "convexSetStep[A,bs] returns the limit of applying hitOrMissTransform
+   on A with the pair of structuring elements bs, unioned with the previous
+   iteration."
+convexSetStep[A_,bs_] := convergeSet[Union[hitOrMissTransform[#,bs],#]&,A]                           
                                           
-
-convexHull::usage=
-  "convexHull[A,Bs] returns the Convex Hull of A using the pairs of sets in B as the structuring
+convexSet::usage=
+  "convexHull[A,Bs] returns a convex set of A using the pairs of sets in B as the structuring
    elements."
-convexHull[A_,Bs_]:= Union @@ ((convexHullStep[A,#] &) /@ Bs)
+convexSet[A_,Bs_]:= Union @@ ((convexSetStep[A,#] &) /@ Bs)
 EndPackage[]
+
+
+
 
 
 
