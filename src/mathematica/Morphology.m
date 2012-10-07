@@ -181,6 +181,14 @@ thin::usage=
   "thin[A,Bs] returns A thinned by the pairs of sets in Bs as the structuring elements."
 thin[A_,Bs_]:= convergeSet[Fold[thinStep,#,Bs]&,A]
 
+thickenStep::usage=
+  "thickenStep[A,Bs] returns A thickened by the pair of structuring elements in bs"
+thickenStep[A_,bs_]:= Union[A, hitOrMissTransform[A,bs]]
+
+thicken::usage=
+  "thicken[A,Bs] returns A thickened by the pairs of sets in Bs as the structuring elements."
+thicken[A_,Bs_] := convergeSet[Fold[thickenStep,#,Bs]&,A]
+
 EndPackage[]
 
 

@@ -50,7 +50,3 @@ thinningPairs = {{thinningHit1, thinningMiss1},
                  {thinningHit8, thinningMiss8}}
 
 EndPackage[]
-
-
-(* ::Title:: *)
-(**)
