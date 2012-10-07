@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 BeginPackage["Morphology`"]
 Needs["Sets`","~/image-processing/src/mathematica/Sets.m"]
 (* Functions for converting between Images and arrays of coordinates*)
@@ -167,13 +169,19 @@ convexSetStep::usage=
 convexSetStep[A_,bs_] := convergeSet[Union[hitOrMissTransform[#,bs],#]&,A]                           
                                           
 convexSet::usage=
-  "convexHull[A,Bs] returns a convex set of A using the pairs of sets in B as the structuring
+  "convexHull[A,Bs] returns a convex set of A using the pairs of sets in Bs as the structuring
    elements."
 convexSet[A_,Bs_]:= Union @@ ((convexSetStep[A,#] &) /@ Bs)
+
+thinStep::usage=
+  "thinStep[A,bs] returns A thinned by the pair of structuring elements in bs"
+thinStep[A_,bs_]:= Complement[A,hitOrMissTransform[A,bs]]
+
+thin::usage=
+  "thin[A,Bs] returns A thinned by the pairs of sets in Bs as the structuring elements."
+thin[A_,Bs_]:= convergeSet[Fold[thinStep,#,Bs]&,A]
+
 EndPackage[]
-
-
-
 
 
 
