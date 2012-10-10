@@ -192,6 +192,7 @@ thicken[A_,Bs_] := convergeSet[Fold[thickenStep,#,Bs]&,A]
 skeleton::usage=
   "skeleton[A,B] returns the skeleton of A, using B as a structuring element."
 skeleton[A_,B_]:= Union@@(Complement[#,open[#,B]]& /@
-                         Most[NestWhileList[erode[#,B]&,A,#!={}&]])
+                           Most[NestWhileList[erode[#,B]&,A,#!={}&]])
+
 
 EndPackage[]
